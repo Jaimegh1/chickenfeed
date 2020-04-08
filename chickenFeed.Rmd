@@ -9,6 +9,11 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
+```{r include=FALSE}
+require(tidyverse)
+require(tigerstats)
+mydata <- read.csv(file = "chickens.csv")
+```
 
 ##  Chicken feed study  
 
@@ -23,31 +28,71 @@ The weight and time to run are numerical variables, gender and feed type are cat
 
 So we'll use templatesRMD Cat Numerical, look for the section that has an 'aov'
 
+```{r}
+plot(weight~sex,data=mydata)
+```
 <!-- This question is like a bunch of t-tests, but instead of doing the t-test a bunch of times we use ANOVA to do all the comparisons at once!  !-->
 
 ### get the data
 
+
+# Numerical results
+
 ```{r}
-chickenData = read.csv('chickens.csv')
-head(chickenData)
-attach(chickenData)
+favstats(weight~sex,data=mydata)
 ```
 
-### Graphical summary
+# Inferential  
+  
+```{r}
+t.test(weight~sex,data=mydata)
+```
+### We conclude that sex is not a significan factor in the weight of the chickens.
 
 <!-- plot chicken weight against each of the three explanatory variables.  Weight against a categorial varable is a boxplot, weight against a numerical variable is a scatter plot !-->
 
 
-### Numerical summary
+### Lets look at speed.
+###Plot scatterplot
 
+```{r}
+plot(weight~speed,data=mydata)
+```
 
+# Numerical results
 
-### Inference -- Analysis of Variance
+```{r}
+cor(weight~speed,data=mydata)
+```
+# Inferential  (Build linear model)
+  
+```{r}
+model.1 <- lm(weight~speed,data=mydata)
+summary.lm(model.1)
+```
+The conclusion is speed is not a useful variable to explain chicken weight.
+###Plot boxplots
 
+```{r}
+plot(weight~feed,data=mydata)
+```
+   
+```{r}
+favstats(weight~feed,data=mydata)
+```
+# Inferential
 
+```{r}
+model1 <- aov(weight~feed,data=mydata)
+summary.aov(model1)
+```
 
-###  Conclusions  -- which variables affect chicken weight?
+```{r}
+#we specify the margins starting at the bottom and proceeding clockwise - thus 8.7 is the left side margin to hold the names of the factors
+par(mar = c(3, 8.7, 2, 2))
+plot(TukeyHSD(model1),las=2)
+```
 
-
-
-
+# conclusion 
+Neither sex or speed are any influence on chicken weight are important.
+However feed is very important.
